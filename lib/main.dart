@@ -92,3 +92,33 @@ class TokenMonitor extends StatelessWidget {
     );
   }
 }
+
+class MessageDisplay extends StatelessWidget {
+  final String? title;
+  final String? body;
+
+  const MessageDisplay({super.key, this.title, this.body});
+
+  @override
+  Widget build(BuildContext context) {
+    if (title == null && body == null) {
+      return const Text('No messages received yet.', style: TextStyle(fontStyle: FontStyle.italic));
+    }
+
+    return Column(
+      children: [
+
+        const Text('Latest Message', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+        const SizedBox(height: 8),
+        Card(
+          color: Theme.of(context).colorScheme.primaryContainer,
+          child: ListTile(
+            leading: const Icon(Icons.notifications_active, color: Colors.deepPurple),
+            title: Text(title ?? '', style: const TextStyle(fontWeight: FontWeight.bold)),
+            subtitle: Text(body ?? ''),
+          ),
+        ),
+      ],
+    );
+  }
+}

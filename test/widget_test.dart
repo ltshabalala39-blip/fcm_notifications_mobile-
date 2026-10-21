@@ -15,4 +15,18 @@ void main() {
     expect(find.text('FCM Token:'), findsOneWidget);
     expect(find.text('Waiting for token...'), findsOneWidget);
   });
+
+
+testWidgets('MessageDisplay shows notification text', (WidgetTester tester) async {
+  await tester.pumpWidget(
+    const MaterialApp(
+      home:Scaffold(
+        body: MessageDisplay(title: 'Alert', body: 'Wash your hands'),
+),
+  ),
+  );
+  expect(find.text('Latest Message'),findsOneWidget );
+  expect(find.text('Alert'), findsOneWidget);
+  expect(find.text('Wash your hands'), findsOneWidget);
+});
 }
