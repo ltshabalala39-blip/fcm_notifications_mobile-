@@ -3,11 +3,22 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'firebase_options.dart';
 
+
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  print("Background message received: ${message.messageId}");
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // 2. Register the background handler
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
   runApp(const FCMApp());
 }
 
@@ -17,7 +28,7 @@ class FCMApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'FCM notifications ',
+      title: 'FCM notifications',
       theme: ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple)),
       home: const NotificationScreen(),
     );
@@ -34,22 +45,40 @@ class NotificationScreen extends StatefulWidget {
 class _NotificationScreenState extends State<NotificationScreen> {
   String? _token;
 
+  // NEW: Variables to hold the incoming message text
+  String? _messageTitle;
+  String? _messageBody;
+
   @override
   void initState() {
     super.initState();
     _setupFCM();
+    _listenForMessages(); // NEW: Trigger the listener when app opens
   }
 
   Future<void> _setupFCM() async {
     FirebaseMessaging messaging = FirebaseMessaging.instance;
 
-    // Request permission from the OS (Required for iOS/Web, recommended for Android)
     await messaging.requestPermission();
 
-    // Fetch the unique device token
-    String? token = await messaging.getToken();
+    String? token = await messaging.getToken(
+      vapidKey: "BASggtFbna3BoHCtkR2Vsu2AgWvnMRyVkok_2jyhJSYvwyul4UcvEbVW2dkVw4jfEkYXf2UVsjJco6GPYe4MulU",
+    );
+
     setState(() {
       _token = token;
+    });
+  }
+
+  // NEW: Listen for messages in the foreground
+  void _listenForMessages() {
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      print("🔥 BINGO! MESSAGE CAUGHT: ${message.notification?.title}");
+
+      setState(() {
+        _messageTitle = message.notification?.title;
+        _messageBody = message.notification?.body;
+      });
     });
   }
 
@@ -61,13 +90,20 @@ class _NotificationScreenState extends State<NotificationScreen> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
       body: Center(
-        child: TokenMonitor(fcmToken: _token),
+        // NEW: Column holds both the token and the message display
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            TokenMonitor(fcmToken: _token),
+            const SizedBox(height: 20),
+            MessageDisplay(title: _messageTitle, body: _messageBody),
+          ],
+        ),
       ),
     );
   }
 }
 
-// Extracted Widget for Clean Architecture (and to pass our test)
 class TokenMonitor extends StatelessWidget {
   final String? fcmToken;
 
@@ -82,7 +118,6 @@ class TokenMonitor extends StatelessWidget {
         children: [
           const Text('FCM Token:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
           const SizedBox(height: 10),
-          // SelectableText allows you to copy the token to your clipboard!
           SelectableText(
             fcmToken ?? 'Waiting for token...',
             textAlign: TextAlign.center,
@@ -107,7 +142,6 @@ class MessageDisplay extends StatelessWidget {
 
     return Column(
       children: [
-
         const Text('Latest Message', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
         const SizedBox(height: 8),
         Card(
