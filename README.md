@@ -2,23 +2,31 @@
 
 WTC-AGHNQZ2B
 
-# Firebase Cloud Messaging App (Track 2)
+# Track 2: Firebase Cloud Messaging (FCM) Integration
 
-This is the Track 2 submission for the Flutter & Dart mobile development elective. It demonstrates the integration of a Flutter frontend with Firebase Cloud Messaging (FCM) to handle real-time push notifications.
+## Overview
+This repository contains Track 2 of the Mobile Development elective. It is a Flutter application demonstrating the integration of Firebase Cloud Messaging (FCM) to handle real-time remote push notifications and asynchronous client-server communication. 
 
 ## Features
-* Scaffolded using the official FlutterFire CLI.
-* Dynamically requests OS notification permissions and generates the device's FCM token.
-* Implements `FirebaseMessaging.onMessage` for foreground notification interception and UI updates.
-* Includes a Web Service Worker (`firebase-messaging-sw.js`) and VAPID key integration to fully support Chrome browser testing.
-* Extracts custom UI components (`TokenMonitor`, `MessageDisplay`) for clean architecture.
+* **Firebase Core Initialization:** Asynchronous bootstrapping of Firebase services upon application launch.
+* **Permission Management:** Runtime requests for user notification permissions on supported platforms.
+* **Token Generation:** Automatic generation and UI-rendering of the unique FCM device registration token for targeted payload delivery.
+* **Cross-Platform Support:** Configured for Flutter Web via the `flutterfire_cli`.
 
-## Proof of Work
-![FCM Push Notification Proof](assets/notification_proof.png)
+## Tech Stack
+* **Framework:** Flutter / Dart
+* **Cloud Infrastructure:** Firebase (Cloud Messaging)
+* **Tooling:** FlutterFire CLI, Firebase Console
 
-## Setup Instructions
-1. Clone this repository.
-2. Ensure you have an active Firebase project with Web/Android applications registered.
-3. Run `flutter pub get` to install the `firebase_core` and `firebase_messaging` dependencies.
-4. To test on the Web, run: `flutter run -d chrome`.
-5. Grant the browser permission to show notifications, copy the generated FCM token, and dispatch a test message via the Firebase Console.
+## Prerequisites
+* Flutter SDK installed and configured.
+* Active Firebase project with Cloud Messaging enabled.
+* Firebase CLI installed (`curl -sL https://firebase.tools | bash`).
+* FlutterFire CLI globally activated (`dart pub global activate flutterfire_cli`).
+
+## Setup and Installation
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/ltshabalala39-blip/fcm_notifications_mobile-/
+  
